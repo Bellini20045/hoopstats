@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: radial-gradient(circle at right, #0f172a, #020617);
+  color: white;
+}
+
+/* LOGIN */
+#login {
+  text-align: center;
+  margin-top: 100px;
+}
+
+#app {
+  display: none;
+  display: flex;
+}
+
+/* SIDEBAR */
+aside {
+  width: 200px;
+  background: #020617;
+  padding: 20px;
+  height: 100vh;
+}
+
+/* MAIN */
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.galaxy {
+  position: relative;
+  height: 350px;
+  margin-top: 30px;
+  border-radius: 15px;
+  background: radial-gradient(circle at center, #020617, #000);
+  overflow: hidden;
+}
+
+/* ORBITA */
+.orbit {
+  position: absolute;
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: spin linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* PLANETA */
+.planet {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #22c55e, #15803d);
+  box-shadow: 0 0 25px #22c55e;
+}
+
+/* PAGES */
+.page { display: none; }
+.active { display: block; }
+
+/* MOBILE */
+@media(max-width: 700px) {
+  aside {
+    display: none;
+  }
+}

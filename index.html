@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>HoopStats Elite</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: rgba(2,6,23,0.9);
+  padding: 20px;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+}
+
+.sidebar h2 {
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.menu button {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.menu button:hover {
+  background: rgba(255,255,255,0.05);
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+/* CARDS */
+.cards {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(15,23,42,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* BUTTON */
+.btn {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+/* PLAYER */
+.player {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(2,6,23,0.8);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* GALAXY */
+.galaxy {
+  position: relative;
+  height: 350px;
+  margin-top: 30px;
+  border-radius: 20px;
+  background: radial-gradient(circle at center, #020617, #000);
+  overflow: hidden;
+}
+
+/* ESTRELAS */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  opacity: 0.6;
+}
+
+/* ORBIT */
+.orbit {
+  position: absolute;
+  border: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 50%;
+  animation: spin linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* PLANET */
+.planet {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #22c55e, #15803d);
+  box-shadow: 0 0 25px #22c55e;
+  transition: 0.3s;
+}
+
+.planet:hover {
+  transform: scale(1.3);
+}
+
+/* PAGE */
+.page { display:none; }
+.active { display:block; }
+
+/* MOBILE */
+@media(max-width:700px){
+  .sidebar { display:none; }
+  .cards { flex-direction: column; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>🏀 HoopStats</h2>
+  <div class="menu">
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('players')">Players</button>
+  </div>
+</div>
+
+<div class="main">
+
+<div id="dashboard" class="page active">
+  <h1>Dashboard</h1>
+  <div class="cards">
+    <div class="card">
+      <h3>Players</h3>
+      <p id="count">0</p>
+    </div>
+    <div class="card">
+      <h3>Total Points</h3>
+      <p id="points">0</p>
+    </div>
+    <div class="card">
+      <h3>Top Player</h3>
+      <p id="top">-</p>
+    </div>
+  </div>
+</div>
+
+<div id="players" class="page">
+  <h1>Players</h1>
+  <button class="btn" onclick="addPlayer()">+ Add Player</button>
+
+  <div class="galaxy" id="galaxy"></div>
+
+  <div id="list"></div>
+</div>
+
+</div>
+
+<script>
+let players = JSON.parse(localStorage.getItem("players")) || [];
+
+function save(){
+  localStorage.setItem("players", JSON.stringify(players));
+}
+
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+}
+
+function addPlayer(){
+  let name = prompt("Nome do jogador:");
+  if(!name) return;
+
+  players.push({name, points:0, assists:0, rebounds:0});
+  save();
+  render();
+}
+
+/* ESTRELAS */
+function createStars(){
+  let galaxy = document.getElementById("galaxy");
+
+  for(let i=0;i<80;i++){
+    let star = document.createElement("div");
+    star.className="star";
+    star.style.top = Math.random()*100+"%";
+    star.style.left = Math.random()*100+"%";
+    galaxy.appendChild(star);
+  }
+}
+
+function render(){
+  let list = document.getElementById("list");
+  let galaxy = document.getElementById("galaxy");
+
+  list.innerHTML="";
+  galaxy.innerHTML="";
+  createStars();
+
+  let total=0;
+  let top={name:"-",points:0};
+
+  players.forEach((p,i)=>{
+    total+=p.points;
+    if(p.points>top.points) top=p;
+
+    list.innerHTML+=`
+      <div class="player">
+        <h3>${p.name}</h3>
+        <p>${p.points} pts | ${p.assists} ast | ${p.rebounds} reb</p>
+        <button onclick="update(${i},2)">+2</button>
+        <button onclick="update(${i},3)">+3</button>
+      </div>
+    `;
+
+    let orbit=document.createElement("div");
+    orbit.className="orbit";
+
+    let size=120+i*80;
+    orbit.style.width=size+"px";
+    orbit.style.height=size+"px";
+    orbit.style.top="50%";
+    orbit.style.left="50%";
+    orbit.style.marginLeft=-(size/2)+"px";
+    orbit.style.marginTop=-(size/2)+"px";
+    orbit.style.animationDuration=(12+i*5)+"s";
+
+    let planet=document.createElement("div");
+    planet.className="planet";
+
+    let pSize=20+p.points*2;
+    planet.style.width=pSize+"px";
+    planet.style.height=pSize+"px";
+    planet.style.top="0";
+    planet.style.left="50%";
+    planet.style.marginLeft=-(pSize/2)+"px";
+
+    orbit.appendChild(planet);
+    galaxy.appendChild(orbit);
+  });
+
+  document.getElementById("count").innerText=players.length;
+  document.getElementById("points").innerText=total;
+  document.getElementById("top").innerText=top.name;
+}
+
+function update(i,val){
+  players[i].points+=val;
+  save();
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
